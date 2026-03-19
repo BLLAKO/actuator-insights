@@ -9,14 +9,16 @@ interface MetricCardProps {
   icon: LucideIcon;
   trend?: "up" | "down" | "stable";
   status?: "normal" | "warning" | "critical";
+  gradient?: string;
 }
 
-export function MetricCard({ title, value, unit, icon: Icon, trend, status = "normal" }: MetricCardProps) {
+export function MetricCard({ title, value, unit, icon: Icon, trend, status = "normal", gradient = "gradient-card-blue" }: MetricCardProps) {
   return (
     <Card className={cn(
-      "border transition-colors",
-      status === "warning" && "border-warning/40",
-      status === "critical" && "border-destructive/40",
+      "border transition-all hover:scale-[1.02] hover:shadow-lg",
+      gradient,
+      status === "warning" && "gradient-card-amber",
+      status === "critical" && "gradient-card-rose",
     )}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
@@ -28,21 +30,21 @@ export function MetricCard({ title, value, unit, icon: Icon, trend, status = "no
             </div>
           </div>
           <div className={cn(
-            "rounded-lg p-2",
-            status === "normal" && "bg-primary/10 text-primary",
-            status === "warning" && "bg-warning/10 text-warning",
-            status === "critical" && "bg-destructive/10 text-destructive",
+            "rounded-xl p-2.5 backdrop-blur-sm",
+            status === "normal" && "bg-primary/15 text-primary",
+            status === "warning" && "bg-warning/15 text-warning",
+            status === "critical" && "bg-destructive/15 text-destructive",
           )}>
-            <Icon className="h-4 w-4" />
+            <Icon className="h-5 w-5" />
           </div>
         </div>
         {trend && (
-          <div className="mt-2 flex items-center gap-1">
+          <div className="mt-3 flex items-center gap-1.5">
             <span className={cn(
-              "text-xs font-medium",
-              trend === "up" && "text-destructive",
-              trend === "down" && "text-success",
-              trend === "stable" && "text-muted-foreground",
+              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+              trend === "up" && "bg-destructive/10 text-destructive",
+              trend === "down" && "bg-success/10 text-success",
+              trend === "stable" && "bg-muted text-muted-foreground",
             )}>
               {trend === "up" ? "↑ Rising" : trend === "down" ? "↓ Falling" : "→ Stable"}
             </span>

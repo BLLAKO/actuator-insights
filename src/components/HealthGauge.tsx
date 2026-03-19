@@ -16,10 +16,10 @@ function getScoreLabel(score: number) {
   return "Critical";
 }
 
-function getScoreBg(score: number) {
-  if (score >= 80) return "from-success/20 to-success/5";
-  if (score >= 60) return "from-warning/20 to-warning/5";
-  return "from-destructive/20 to-destructive/5";
+function getGradientId(score: number) {
+  if (score >= 80) return "gaugeGradGreen";
+  if (score >= 60) return "gaugeGradAmber";
+  return "gaugeGradRed";
 }
 
 export function HealthGauge({ score }: HealthGaugeProps) {
@@ -28,23 +28,46 @@ export function HealthGauge({ score }: HealthGaugeProps) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className={cn("relative rounded-full bg-gradient-to-b p-6", getScoreBg(score))}>
-        <svg width="140" height="140" viewBox="0 0 140 140" className="-rotate-90">
+      <div className="relative">
+        <svg width="150" height="150" viewBox="0 0 150 150" className="-rotate-90">
+          <defs>
+            <linearGradient id="gaugeGradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(185 80% 50%)" />
+              <stop offset="100%" stopColor="hsl(160 70% 45%)" />
+            </linearGradient>
+            <linearGradient id="gaugeGradAmber" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(45 95% 55%)" />
+              <stop offset="100%" stopColor="hsl(25 90% 50%)" />
+            </linearGradient>
+            <linearGradient id="gaugeGradRed" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(350 80% 55%)" />
+              <stop offset="100%" stopColor="hsl(0 75% 50%)" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
           <circle
-            cx="70" cy="70" r="58"
+            cx="75" cy="75" r="58"
             fill="none"
             stroke="hsl(var(--muted))"
             strokeWidth="10"
+            opacity="0.4"
           />
           <circle
-            cx="70" cy="70" r="58"
+            cx="75" cy="75" r="58"
             fill="none"
-            stroke="currentColor"
+            stroke={`url(#${getGradientId(score)})`}
             strokeWidth="10"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className={cn("transition-all duration-1000", getScoreColor(score))}
+            className="transition-all duration-1000"
+            filter="url(#glow)"
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">

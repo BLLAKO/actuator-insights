@@ -6,6 +6,7 @@ import { AnomalyLog } from "@/components/AnomalyLog";
 import { MachineStatusPanel } from "@/components/MachineStatusPanel";
 import { DevicesPanel } from "@/components/DevicesPanel";
 import { AiAssistant } from "@/components/AiAssistant";
+import { PredictivePanel } from "@/components/PredictivePanel";
 import { mockTelemetry, mockAnomalies, healthScore } from "@/lib/mockData";
 import { Activity, Thermometer, Zap, RotateCcw, Gauge, Monitor, Cpu } from "lucide-react";
 import {
@@ -19,7 +20,7 @@ export default function Index() {
     <div className="dark min-h-screen bg-background">
       <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
         {/* Header */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between gradient-header rounded-xl p-4 -mx-1">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Belimo Actuator Health Monitor
@@ -28,7 +29,7 @@ export default function Index() {
               Predictive maintenance dashboard — Real-time telemetry & anomaly detection
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-full bg-success/10 px-3 py-1.5">
+          <div className="flex items-center gap-2 rounded-full bg-success/10 border border-success/20 px-3 py-1.5">
             <span className="h-2 w-2 animate-pulse-glow rounded-full bg-success" />
             <span className="font-mono text-xs text-success">CONNECTED</span>
           </div>
@@ -36,14 +37,14 @@ export default function Index() {
 
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-4">
-          <TabsList className="bg-secondary">
-            <TabsTrigger value="dashboard" className="gap-2">
+          <TabsList className="bg-secondary/80 backdrop-blur-sm">
+            <TabsTrigger value="dashboard" className="gap-2 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
               <Activity className="h-4 w-4" /> Dashboard
             </TabsTrigger>
-            <TabsTrigger value="status" className="gap-2">
+            <TabsTrigger value="status" className="gap-2 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
               <Monitor className="h-4 w-4" /> Machine Status
             </TabsTrigger>
-            <TabsTrigger value="devices" className="gap-2">
+            <TabsTrigger value="devices" className="gap-2 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
               <Cpu className="h-4 w-4" /> Devices
             </TabsTrigger>
           </TabsList>
@@ -52,7 +53,7 @@ export default function Index() {
           <TabsContent value="dashboard" className="space-y-6">
             {/* Top Row: Health Score + Metrics */}
             <div className="grid gap-4 md:grid-cols-5">
-              <Card className="md:col-span-1">
+              <Card className="md:col-span-1 gradient-card-emerald border">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                     Health Score
@@ -63,16 +64,19 @@ export default function Index() {
                 </CardContent>
               </Card>
               <div className="grid grid-cols-2 gap-4 md:col-span-4 md:grid-cols-4">
-                <MetricCard title="Torque" value={String(latest.torque)} unit="Nmm" icon={Gauge} trend="up" status="warning" />
-                <MetricCard title="Temperature" value={String(latest.temperature)} unit="°C" icon={Thermometer} trend="up" status={latest.temperature > 40 ? "warning" : "normal"} />
-                <MetricCard title="Power" value={String(latest.power)} unit="W" icon={Zap} trend="stable" />
-                <MetricCard title="Position" value={String(latest.feedback)} unit="%" icon={RotateCcw} trend="stable" />
+                <MetricCard title="Torque" value={String(latest.torque)} unit="Nmm" icon={Gauge} trend="up" status="warning" gradient="gradient-card-blue" />
+                <MetricCard title="Temperature" value={String(latest.temperature)} unit="°C" icon={Thermometer} trend="up" status={latest.temperature > 40 ? "warning" : "normal"} gradient="gradient-card-amber" />
+                <MetricCard title="Power" value={String(latest.power)} unit="W" icon={Zap} trend="stable" gradient="gradient-card-emerald" />
+                <MetricCard title="Position" value={String(latest.feedback)} unit="%" icon={RotateCcw} trend="stable" gradient="gradient-card-blue" />
               </div>
             </div>
 
+            {/* Predictive Analysis */}
+            <PredictivePanel />
+
             {/* Charts */}
             <Tabs defaultValue="torque" className="space-y-4">
-              <TabsList className="bg-secondary">
+              <TabsList className="bg-secondary/80">
                 <TabsTrigger value="torque">Torque</TabsTrigger>
                 <TabsTrigger value="position">Position</TabsTrigger>
                 <TabsTrigger value="temperature">Temperature</TabsTrigger>
@@ -80,7 +84,7 @@ export default function Index() {
               </TabsList>
 
               <TabsContent value="torque">
-                <Card>
+                <Card className="border-border/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                       <Activity className="h-4 w-4 text-primary" />
@@ -97,10 +101,10 @@ export default function Index() {
                               <stop offset="95%" stopColor="hsl(210 100% 55%)" stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(225 18% 18%)" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
                           <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
                           <YAxis stroke="hsl(215 15% 55%)" fontSize={11} />
-                          <Tooltip contentStyle={{ background: "hsl(225 22% 11%)", border: "1px solid hsl(225 18% 18%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
                           <ReferenceLine y={1000} stroke="hsl(0 80% 55%)" strokeDasharray="5 5" label={{ value: "Threshold", fill: "hsl(0 80% 55%)", fontSize: 11 }} />
                           <Area type="monotone" dataKey="torque" stroke="hsl(210 100% 55%)" fill="url(#torqueGrad)" strokeWidth={2} dot={false} />
                         </AreaChart>
@@ -111,7 +115,7 @@ export default function Index() {
               </TabsContent>
 
               <TabsContent value="position">
-                <Card>
+                <Card className="border-border/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                       <RotateCcw className="h-4 w-4 text-primary" />
@@ -122,10 +126,10 @@ export default function Index() {
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={mockTelemetry}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(225 18% 18%)" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
                           <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
                           <YAxis stroke="hsl(215 15% 55%)" fontSize={11} domain={[0, 110]} />
-                          <Tooltip contentStyle={{ background: "hsl(225 22% 11%)", border: "1px solid hsl(225 18% 18%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
                           <Line type="monotone" dataKey="setpoint" stroke="hsl(210 100% 55%)" strokeWidth={2} dot={false} name="Setpoint" />
                           <Line type="monotone" dataKey="feedback" stroke="hsl(160 70% 45%)" strokeWidth={2} dot={false} name="Feedback" strokeDasharray="4 2" />
                         </LineChart>
@@ -136,7 +140,7 @@ export default function Index() {
               </TabsContent>
 
               <TabsContent value="temperature">
-                <Card>
+                <Card className="border-border/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                       <Thermometer className="h-4 w-4 text-warning" />
@@ -153,10 +157,10 @@ export default function Index() {
                               <stop offset="95%" stopColor="hsl(38 95% 55%)" stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(225 18% 18%)" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
                           <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
                           <YAxis stroke="hsl(215 15% 55%)" fontSize={11} />
-                          <Tooltip contentStyle={{ background: "hsl(225 22% 11%)", border: "1px solid hsl(225 18% 18%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
                           <ReferenceLine y={50} stroke="hsl(0 80% 55%)" strokeDasharray="5 5" label={{ value: "Max Limit", fill: "hsl(0 80% 55%)", fontSize: 11 }} />
                           <Area type="monotone" dataKey="temperature" stroke="hsl(38 95% 55%)" fill="url(#tempGrad)" strokeWidth={2} dot={false} />
                         </AreaChart>
@@ -167,7 +171,7 @@ export default function Index() {
               </TabsContent>
 
               <TabsContent value="power">
-                <Card>
+                <Card className="border-border/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                       <Zap className="h-4 w-4 text-primary" />
@@ -184,10 +188,10 @@ export default function Index() {
                               <stop offset="95%" stopColor="hsl(160 70% 45%)" stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(225 18% 18%)" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
                           <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
                           <YAxis stroke="hsl(215 15% 55%)" fontSize={11} />
-                          <Tooltip contentStyle={{ background: "hsl(225 22% 11%)", border: "1px solid hsl(225 18% 18%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
                           <Area type="monotone" dataKey="power" stroke="hsl(160 70% 45%)" fill="url(#powerGrad)" strokeWidth={2} dot={false} />
                         </AreaChart>
                       </ResponsiveContainer>
@@ -198,12 +202,12 @@ export default function Index() {
             </Tabs>
 
             {/* Anomaly Log */}
-            <Card>
+            <Card className="border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <AlertTriangleIcon />
                   Anomaly Detection Log
-                  <span className="ml-auto rounded-full bg-destructive/20 px-2 py-0.5 font-mono text-xs text-destructive">
+                  <span className="ml-auto rounded-full bg-destructive/15 border border-destructive/20 px-2.5 py-0.5 font-mono text-xs text-destructive">
                     {mockAnomalies.length} alerts
                   </span>
                 </CardTitle>
