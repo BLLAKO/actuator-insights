@@ -97,16 +97,16 @@ export default function Index() {
                         <AreaChart data={mockTelemetry}>
                           <defs>
                             <linearGradient id="torqueGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="hsl(210 100% 55%)" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="hsl(210 100% 55%)" stopOpacity={0} />
+                              <stop offset="5%" stopColor="hsl(200 100% 55%)" stopOpacity={0.35} />
+                              <stop offset="95%" stopColor="hsl(200 100% 55%)" stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
-                          <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
-                          <YAxis stroke="hsl(215 15% 55%)" fontSize={11} />
-                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 20% 20%)" />
+                          <XAxis dataKey="time" stroke="hsl(220 20% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
+                          <YAxis stroke="hsl(220 20% 55%)" fontSize={11} />
+                          <Tooltip contentStyle={{ background: "hsl(238 30% 13%)", border: "1px solid hsl(240 20% 20%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
                           <ReferenceLine y={1000} stroke="hsl(0 80% 55%)" strokeDasharray="5 5" label={{ value: "Threshold", fill: "hsl(0 80% 55%)", fontSize: 11 }} />
-                          <Area type="monotone" dataKey="torque" stroke="hsl(210 100% 55%)" fill="url(#torqueGrad)" strokeWidth={2} dot={false} />
+                          <Area type="monotone" dataKey="torque" stroke="hsl(200 100% 55%)" fill="url(#torqueGrad)" strokeWidth={2} dot={false} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
