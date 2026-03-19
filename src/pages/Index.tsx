@@ -157,10 +157,10 @@ export default function Index() {
                               <stop offset="95%" stopColor="hsl(38 95% 55%)" stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
-                          <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
-                          <YAxis stroke="hsl(215 15% 55%)" fontSize={11} />
-                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 20% 20%)" />
+                          <XAxis dataKey="time" stroke="hsl(220 20% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
+                          <YAxis stroke="hsl(220 20% 55%)" fontSize={11} />
+                          <Tooltip contentStyle={{ background: "hsl(238 30% 13%)", border: "1px solid hsl(240 20% 20%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
                           <ReferenceLine y={50} stroke="hsl(0 80% 55%)" strokeDasharray="5 5" label={{ value: "Max Limit", fill: "hsl(0 80% 55%)", fontSize: 11 }} />
                           <Area type="monotone" dataKey="temperature" stroke="hsl(38 95% 55%)" fill="url(#tempGrad)" strokeWidth={2} dot={false} />
                         </AreaChart>
