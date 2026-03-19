@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bot, Send, X, MessageSquare } from "lucide-react";
 import { mockTelemetry, mockAnomalies, healthScore, machineStatus } from "@/lib/mockData";
+import { useAiAssistant } from "./AiAssistantContext";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-// Simple local AI that responds based on data context
 function generateResponse(question: string): string {
   const q = question.toLowerCase();
   const latest = mockTelemetry[mockTelemetry.length - 1];
@@ -24,29 +24,33 @@ function generateResponse(question: string): string {
   }
 
   if (q.includes("torque")) {
-    return `Current torque reading is **${latest.torque} Nmm** with an average of **${avgTorque} Nmm** over the last 2 hours. The threshold is set at 1,000 Nmm. ${highAnomalies.some((a) => a.type === "torque_spike") ? "A torque spike was detected earlier — this could indicate mechanical resistance, valve sticking, or debris in the actuator path." : "Torque levels are within normal operating range."}`;
+    return `Current torque reading is **${latest.torque} Nmm** with an average of **${avgTorque} Nmm** over the last 2 hours. The threshold is set at 1,000 Nmm. ${highAnomalies.some((a) => a.type === "torque_spike") ? "A torque spike was detected earlier — this could indicate mechanical resistance, valve sticking, or debris in the actuator path. **Recommended action:** Schedule a physical inspection of the actuator and valve linkage." : "Torque levels are within normal operating range."}`;
   }
 
   if (q.includes("temperature") || q.includes("temp")) {
-    return `Internal temperature is currently **${latest.temperature.toFixed(1)}°C**, with a peak of **${maxTemp.toFixed(1)}°C** in the last 2 hours. The warning limit is 50°C. ${maxTemp > 40 ? "Temperature is trending upward — this could be caused by continuous operation, high ambient temperature, or increased mechanical load." : "Temperature is well within safe limits."}`;
+    return `Internal temperature is currently **${latest.temperature.toFixed(1)}°C**, with a peak of **${maxTemp.toFixed(1)}°C** in the last 2 hours. The warning limit is 50°C. ${maxTemp > 40 ? "Temperature is trending upward — this could be caused by continuous operation, high ambient temperature, or increased mechanical load. **Recommended action:** Check ventilation and consider duty cycle adjustments." : "Temperature is well within safe limits."}`;
   }
 
-  if (q.includes("anomal") || q.includes("alert") || q.includes("warning")) {
+  if (q.includes("anomal") || q.includes("alert") || q.includes("warning") || q.includes("caused") || q.includes("guidance")) {
     const summary = mockAnomalies.map((a) => `- **${a.severity.toUpperCase()}**: ${a.message}`).join("\n");
-    return `There are **${mockAnomalies.length} active anomalies**:\n\n${summary}\n\nHigh-severity alerts should be investigated first as they may indicate equipment degradation.`;
+    return `There are **${mockAnomalies.length} active anomalies**:\n\n${summary}\n\nHigh-severity alerts should be investigated first as they may indicate equipment degradation. **Recommended:** Check mechanical linkages and review operating conditions.`;
   }
 
   if (q.includes("status") || q.includes("state") || q.includes("running")) {
     return `The machine is currently **${machineStatus.state}** (since ${machineStatus.lastStateChange}). Total uptime in this session: **${machineStatus.uptime}**. The system has cycled through multiple states in the last 2 hours including off, running, and stillstand periods.`;
   }
 
-  if (q.includes("position") || q.includes("setpoint") || q.includes("feedback")) {
+  if (q.includes("position") || q.includes("setpoint") || q.includes("feedback") || q.includes("drift") || q.includes("accurate") || q.includes("tracking")) {
     const drift = Math.abs(latest.setpoint - latest.feedback);
-    return `Current setpoint is **${latest.setpoint}%** with feedback at **${latest.feedback}%** (drift: ${drift.toFixed(1)}%). ${drift > 3 ? "There's notable drift between setpoint and feedback — this may indicate mechanical wear or calibration issues." : "Position tracking is accurate with minimal drift."}`;
+    return `Current setpoint is **${latest.setpoint}%** with feedback at **${latest.feedback}%** (drift: ${drift.toFixed(1)}%). ${drift > 3 ? "There's notable drift between setpoint and feedback — this may indicate mechanical wear, potentiometer degradation, or calibration issues. **Recommended:** Run a calibration cycle and inspect linkage." : "Position tracking is accurate with minimal drift."}`;
   }
 
   if (q.includes("power") || q.includes("consumption") || q.includes("energy")) {
     return `Current power consumption is **${latest.power} W**. Average across the session is approximately ${(mockTelemetry.reduce((s, d) => s + d.power, 0) / mockTelemetry.length).toFixed(2)} W. Power spikes typically correlate with high-torque events during valve movement.`;
+  }
+
+  if (q.includes("oscillation") || q.includes("hunting")) {
+    return `Position oscillation occurs when the actuator repeatedly overshoots and corrects around the setpoint. Current deviation is **±8%**. This is typically caused by:\n\n- **PID tuning issues** — control loop gains may be too aggressive\n- **Mechanical play** — loose linkage or worn gears\n- **Signal noise** — electrical interference on feedback signal\n\n**Recommended:** Review PID parameters and check for mechanical backlash.`;
   }
 
   if (q.includes("help") || q.includes("what can")) {
@@ -57,9 +61,9 @@ function generateResponse(question: string): string {
 }
 
 export function AiAssistant() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen, consumeQuestion, pendingQuestion } = useAiAssistant();
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hi, I'm your actuator data assistant. Ask me anything about the telemetry, health score, anomalies, or machine status." },
+    { role: "assistant", content: "Hi, I'm your actuator data assistant. Ask me anything about the telemetry, health score, anomalies, or machine status — or click any metric for details." },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -71,6 +75,23 @@ export function AiAssistant() {
     }
   }, [messages]);
 
+  // Handle incoming questions from context
+  useEffect(() => {
+    if (isOpen && pendingQuestion) {
+      const question = consumeQuestion();
+      if (question) {
+        const userMsg: Message = { role: "user", content: question };
+        setMessages((prev) => [...prev, userMsg]);
+        setIsTyping(true);
+        setTimeout(() => {
+          const response = generateResponse(question);
+          setMessages((prev) => [...prev, { role: "assistant", content: response }]);
+          setIsTyping(false);
+        }, 600 + Math.random() * 800);
+      }
+    }
+  }, [isOpen, pendingQuestion, consumeQuestion]);
+
   const handleSend = () => {
     if (!input.trim()) return;
     const userMsg: Message = { role: "user", content: input.trim() };
@@ -78,7 +99,6 @@ export function AiAssistant() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate typing delay
     setTimeout(() => {
       const response = generateResponse(userMsg.content);
       setMessages((prev) => [...prev, { role: "assistant", content: response }]);
@@ -100,7 +120,6 @@ export function AiAssistant() {
 
   return (
     <Card className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[380px] flex-col shadow-2xl border-border">
-      {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
@@ -111,7 +130,6 @@ export function AiAssistant() {
         </Button>
       </div>
 
-      {/* Messages */}
       <ScrollArea className="flex-1 px-4 py-3" ref={scrollRef}>
         <div className="space-y-3">
           {messages.map((msg, i) => (
@@ -139,7 +157,6 @@ export function AiAssistant() {
         </div>
       </ScrollArea>
 
-      {/* Input */}
       <div className="border-t border-border p-3">
         <form
           onSubmit={(e) => {
