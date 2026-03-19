@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ShieldAlert, Clock, TrendingUp } from "lucide-react";
-import { healthScore, mockAnomalies } from "@/lib/mockData";
+import { AnomalyEvent } from "@/lib/mockData";
 
 interface PredictionWindow {
   label: string;
@@ -9,11 +9,15 @@ interface PredictionWindow {
   probability: number;
 }
 
-function computeFailureProbabilities(): PredictionWindow[] {
-  // Simple mock prediction based on health score and anomaly severity
-  const baseRisk = (100 - healthScore) / 100;
-  const highCount = mockAnomalies.filter((a) => a.severity === "high").length;
-  const medCount = mockAnomalies.filter((a) => a.severity === "medium").length;
+interface PredictivePanelProps {
+  healthScore?: number;
+  anomalies?: AnomalyEvent[];
+}
+
+function computeFailureProbabilities(score: number, anomalies: AnomalyEvent[]): PredictionWindow[] {
+  const baseRisk = (100 - score) / 100;
+  const highCount = anomalies.filter((a) => a.severity === "high").length;
+  const medCount = anomalies.filter((a) => a.severity === "medium").length;
   const anomalyFactor = highCount * 0.12 + medCount * 0.05;
 
   const p24h = Math.min(0.95, baseRisk * 0.4 + anomalyFactor * 0.8);
@@ -39,8 +43,8 @@ function getRiskLabel(prob: number) {
   return "High Risk";
 }
 
-export function PredictivePanel() {
-  const predictions = computeFailureProbabilities();
+export function PredictivePanel({ healthScore = 66, anomalies = [] }: PredictivePanelProps) {
+  const predictions = computeFailureProbabilities(healthScore, anomalies);
 
   return (
     <Card className="gradient-card-violet border">
@@ -85,7 +89,7 @@ export function PredictivePanel() {
           <div className="flex items-start gap-2">
             <ShieldAlert className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Predictions based on current health score ({healthScore}/100), active anomaly count ({mockAnomalies.length}), and severity weighting. Connect real historical data for ML-based accuracy.
+              Predictions based on current health score ({healthScore}/100), active anomaly count ({anomalies.length}), and severity weighting.
             </p>
           </div>
         </div>

@@ -10,12 +10,12 @@ import { AiAssistant } from "@/components/AiAssistant";
 import { GamificationPanel } from "@/components/GamificationPanel";
 import { PredictivePanel } from "@/components/PredictivePanel";
 import { TelemetryCharts } from "@/components/TelemetryCharts";
-import { mockTelemetry, mockAnomalies, healthScore } from "@/lib/mockData";
-import { Activity, Thermometer, Zap, RotateCcw, Gauge, Monitor, Cpu } from "lucide-react";
-
-const latest = mockTelemetry[mockTelemetry.length - 1];
+import { useLiveData } from "@/hooks/useLiveData";
+import { Activity, Thermometer, Zap, RotateCcw, Gauge, Monitor, Cpu, Wifi, WifiOff } from "lucide-react";
 
 export default function Index() {
+  const { telemetry, anomalies, healthScore, latest, isLive, isConnecting, lastUpdated } = useLiveData();
+
   return (
     <AiAssistantProvider>
     <div className="dark min-h-screen bg-background">
@@ -30,9 +30,37 @@ export default function Index() {
               Predictive maintenance dashboard — Real-time telemetry & anomaly detection
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-full bg-success/10 border border-success/20 px-3 py-1.5">
-            <span className="h-2 w-2 animate-pulse-glow rounded-full bg-success" />
-            <span className="font-mono text-xs text-success">CONNECTED</span>
+          <div className="flex items-center gap-3">
+            {lastUpdated && isLive && (
+              <span className="text-[10px] font-mono text-muted-foreground">
+                Updated {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+            <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 border ${
+              isConnecting
+                ? "bg-warning/10 border-warning/20"
+                : isLive
+                  ? "bg-success/10 border-success/20"
+                  : "bg-muted/50 border-border"
+            }`}>
+              {isConnecting ? (
+                <>
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-warning" />
+                  <span className="font-mono text-xs text-warning">CONNECTING...</span>
+                </>
+              ) : isLive ? (
+                <>
+                  <Wifi className="h-3 w-3 text-success" />
+                  <span className="h-2 w-2 animate-pulse-glow rounded-full bg-success" />
+                  <span className="font-mono text-xs text-success">LIVE</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="h-3 w-3 text-muted-foreground" />
+                  <span className="font-mono text-xs text-muted-foreground">DEMO MODE</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -65,36 +93,32 @@ export default function Index() {
                 </CardContent>
               </Card>
               <div className="grid grid-cols-2 gap-4 md:col-span-4 md:grid-cols-4">
-                <MetricCard title="Torque" value={String(latest.torque)} unit="Nmm" icon={Gauge} trend="up" status="warning" gradient="gradient-card-blue" />
-                <MetricCard title="Temperature" value={String(latest.temperature)} unit="°C" icon={Thermometer} trend="up" status={latest.temperature > 40 ? "warning" : "normal"} gradient="gradient-card-amber" />
+                <MetricCard title="Torque" value={String(latest.torque)} unit="Nmm" icon={Gauge} trend="up" status={latest.torque > 1000 ? "critical" : latest.torque > 900 ? "warning" : "normal"} gradient="gradient-card-blue" />
+                <MetricCard title="Temperature" value={String(latest.temperature)} unit="°C" icon={Thermometer} trend="up" status={latest.temperature > 45 ? "critical" : latest.temperature > 40 ? "warning" : "normal"} gradient="gradient-card-amber" />
                 <MetricCard title="Power" value={String(latest.power)} unit="W" icon={Zap} trend="stable" gradient="gradient-card-emerald" />
                 <MetricCard title="Position" value={String(latest.feedback)} unit="%" icon={RotateCcw} trend="stable" gradient="gradient-card-blue" />
               </div>
             </div>
 
-            {/* ── Section 2: Analysis — Charts + Predictions + Anomalies side-by-side ── */}
+            {/* ── Section 2: Analysis ── */}
             <div className="grid gap-4 lg:grid-cols-5">
-              {/* Charts take 3/5 */}
               <div className="lg:col-span-3">
-                <TelemetryCharts />
+                <TelemetryCharts data={telemetry} />
               </div>
-
-              {/* Right sidebar: Predictions + Anomalies stacked */}
               <div className="lg:col-span-2 flex flex-col gap-4">
-                <PredictivePanel />
-
+                <PredictivePanel healthScore={healthScore} anomalies={anomalies} />
                 <Card className="border-border/50 flex-1">
                   <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-sm">
                       <AlertTriangleIcon />
                       Anomaly Log
                       <span className="ml-auto rounded-full bg-destructive/15 border border-destructive/20 px-2 py-0.5 font-mono text-xs text-destructive">
-                        {mockAnomalies.length}
+                        {anomalies.length}
                       </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <AnomalyLog anomalies={mockAnomalies} />
+                    <AnomalyLog anomalies={anomalies} />
                   </CardContent>
                 </Card>
               </div>
@@ -104,19 +128,15 @@ export default function Index() {
             <GamificationPanel />
           </TabsContent>
 
-          {/* Machine Status Tab */}
           <TabsContent value="status">
             <MachineStatusPanel />
           </TabsContent>
-
-          {/* Devices Tab */}
           <TabsContent value="devices">
             <DevicesPanel />
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* AI Assistant */}
       <AiAssistant />
     </div>
     </AiAssistantProvider>

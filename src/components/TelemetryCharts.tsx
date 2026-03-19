@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockTelemetry } from "@/lib/mockData";
+import { TelemetryPoint } from "@/lib/mockData";
 import { Activity, Thermometer, Zap, RotateCcw } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine,
@@ -10,7 +10,14 @@ const chartGrid = "hsl(240 20% 20%)";
 const chartAxis = "hsl(220 20% 55%)";
 const chartTooltip = { background: "hsl(238 30% 13%)", border: "1px solid hsl(240 20% 20%)", borderRadius: 8, fontSize: 12 };
 
-export function TelemetryCharts() {
+interface TelemetryChartsProps {
+  data?: TelemetryPoint[];
+}
+
+export function TelemetryCharts({ data }: TelemetryChartsProps) {
+  // Fallback handled upstream — data is always provided
+  const chartData = data ?? [];
+
   return (
     <Tabs defaultValue="torque" className="space-y-3">
       <TabsList className="bg-secondary/80">
@@ -31,7 +38,7 @@ export function TelemetryCharts() {
           <CardContent>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mockTelemetry}>
+                <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="torqueGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(200 100% 55%)" stopOpacity={0.35} />
@@ -62,7 +69,7 @@ export function TelemetryCharts() {
           <CardContent>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockTelemetry}>
+                <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} />
                   <XAxis dataKey="time" stroke={chartAxis} fontSize={10} tickFormatter={(v) => `${v}m`} />
                   <YAxis stroke={chartAxis} fontSize={10} domain={[0, 110]} />
@@ -87,7 +94,7 @@ export function TelemetryCharts() {
           <CardContent>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mockTelemetry}>
+                <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(38 95% 55%)" stopOpacity={0.3} />
@@ -118,7 +125,7 @@ export function TelemetryCharts() {
           <CardContent>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mockTelemetry}>
+                <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="powerGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(165 75% 46%)" stopOpacity={0.35} />
