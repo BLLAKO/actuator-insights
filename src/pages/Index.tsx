@@ -6,6 +6,7 @@ import { AnomalyLog } from "@/components/AnomalyLog";
 import { MachineStatusPanel } from "@/components/MachineStatusPanel";
 import { DevicesPanel } from "@/components/DevicesPanel";
 import { AiAssistant } from "@/components/AiAssistant";
+import { GamificationPanel } from "@/components/GamificationPanel";
 import { PredictivePanel } from "@/components/PredictivePanel";
 import { mockTelemetry, mockAnomalies, healthScore } from "@/lib/mockData";
 import { Activity, Thermometer, Zap, RotateCcw, Gauge, Monitor, Cpu } from "lucide-react";
