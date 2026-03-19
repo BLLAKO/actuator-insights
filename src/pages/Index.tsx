@@ -126,12 +126,12 @@ export default function Index() {
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={mockTelemetry}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
-                          <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
-                          <YAxis stroke="hsl(215 15% 55%)" fontSize={11} domain={[0, 110]} />
-                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
-                          <Line type="monotone" dataKey="setpoint" stroke="hsl(210 100% 55%)" strokeWidth={2} dot={false} name="Setpoint" />
-                          <Line type="monotone" dataKey="feedback" stroke="hsl(160 70% 45%)" strokeWidth={2} dot={false} name="Feedback" strokeDasharray="4 2" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 20% 20%)" />
+                          <XAxis dataKey="time" stroke="hsl(220 20% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
+                          <YAxis stroke="hsl(220 20% 55%)" fontSize={11} domain={[0, 110]} />
+                          <Tooltip contentStyle={{ background: "hsl(238 30% 13%)", border: "1px solid hsl(240 20% 20%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <Line type="monotone" dataKey="setpoint" stroke="hsl(200 100% 55%)" strokeWidth={2} dot={false} name="Setpoint" />
+                          <Line type="monotone" dataKey="feedback" stroke="hsl(165 75% 46%)" strokeWidth={2} dot={false} name="Feedback" strokeDasharray="4 2" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
