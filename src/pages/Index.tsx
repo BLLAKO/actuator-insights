@@ -184,15 +184,15 @@ export default function Index() {
                         <AreaChart data={mockTelemetry}>
                           <defs>
                             <linearGradient id="powerGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="hsl(160 70% 45%)" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="hsl(160 70% 45%)" stopOpacity={0} />
+                              <stop offset="5%" stopColor="hsl(165 75% 46%)" stopOpacity={0.35} />
+                              <stop offset="95%" stopColor="hsl(165 75% 46%)" stopOpacity={0} />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(228 15% 16%)" />
-                          <XAxis dataKey="time" stroke="hsl(215 15% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
-                          <YAxis stroke="hsl(215 15% 55%)" fontSize={11} />
-                          <Tooltip contentStyle={{ background: "hsl(228 22% 10%)", border: "1px solid hsl(228 15% 16%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
-                          <Area type="monotone" dataKey="power" stroke="hsl(160 70% 45%)" fill="url(#powerGrad)" strokeWidth={2} dot={false} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 20% 20%)" />
+                          <XAxis dataKey="time" stroke="hsl(220 20% 55%)" fontSize={11} tickFormatter={(v) => `${v}m`} />
+                          <YAxis stroke="hsl(220 20% 55%)" fontSize={11} />
+                          <Tooltip contentStyle={{ background: "hsl(238 30% 13%)", border: "1px solid hsl(240 20% 20%)", borderRadius: 8, fontSize: 12 }} labelFormatter={(v) => `${v} min`} />
+                          <Area type="monotone" dataKey="power" stroke="hsl(165 75% 46%)" fill="url(#powerGrad)" strokeWidth={2} dot={false} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
